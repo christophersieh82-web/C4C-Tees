@@ -3,216 +3,355 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C4C Tees Store</title>
+<title>C4C Tees</title>
 <style>
-/* Reset & Fonts */
-* { box-sizing:border-box; margin:0; padding:0; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; color:#333; }
-a { text-decoration:none; color:inherit; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #f5c518;
+    overflow-x: hidden;
+  }
+  header {
+    background: #111;
+    padding: 1rem;
+    text-align: center;
+  }
+  header h1 {
+    font-family: 'Old English Text MT', serif;
+    font-size: 2.5rem;
+    margin: 0;
+    color: #f5c518;
+  }
+  nav {
+    display: flex;
+    justify-content: center;
+    background: #222;
+    padding: 0.5rem;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: none;
+    border: none;
+    color: #f5c518;
+    margin: 0.3rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  nav button:hover { color: white; }
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .product {
+    background: #111;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(245,197,24,0.3);
+    position: relative;
+    opacity: 0;
+    animation: fadeIn 0.6s forwards;
+  }
+  .product img {
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .product h3 { margin: 0.5rem 0; }
+  .product button {
+    background: #f5c518;
+    color: #000;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .product:hover { transform: scale(1.05); transition: transform 0.3s; }
+  #payment span.highlight:hover { text-decoration: underline; cursor: pointer; }
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background: #111;
+    font-size: 0.9rem;
+  }
 
-/* Header / Hero */
-header { background:#046804; color:white; padding:40px 20px; text-align:center; }
-header h1 { font-size:3rem; margin-bottom:5px; }
-header p { font-size:1.2rem; }
+  /* Lightbox */
+  #lightbox {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.85);
+    justify-content:center;
+    align-items:center;
+  }
+  #lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius:8px;
+    box-shadow: 0 0 20px #f5c518;
+  }
 
-/* Category Tabs */
-.categories { display:flex; justify-content:center; gap:10px; margin:20px 0; flex-wrap:wrap; }
-.category-btn { background:#eee; padding:10px 20px; border-radius:20px; border:none; cursor:pointer; transition:0.3s; font-weight:bold; }
-.category-btn.active, .category-btn:hover { background:#046804; color:white; }
+  /* Cart Drawer */
+  #cart-drawer {
+    position: fixed;
+    right: -350px;
+    top: 0;
+    width: 350px;
+    height: 100%;
+    background: #222;
+    color: #f5c518;
+    padding: 1rem;
+    box-shadow: -2px 0 10px rgba(245,197,24,0.5);
+    transition: right 0.3s;
+    z-index: 1500;
+    overflow-y: auto;
+  }
+  #cart-drawer h2 { margin-top:0; }
+  #cart-drawer ul { padding-left: 20px; }
+  #cart-drawer button.close-cart {
+    background: #f5c518;
+    color: #000;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  #cart-drawer button.close-cart:hover { background: white; }
 
-/* Products Grid */
-.products { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:20px; padding:0 20px 40px; }
-.product { background:white; padding:15px; border-radius:10px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:0.3s; position:relative; }
-.product:hover { transform: translateY(-5px); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
-.product img { width:100%; border-radius:10px; cursor:pointer; }
-.product h2 { margin:10px 0 5px; font-size:1.2rem; }
-.product p { margin:5px 0; font-weight:bold; }
-.buy-btn { background:#046804; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-size:1rem; transition:0.2s; }
-.buy-btn:hover { background:#034b02; }
+  /* Admin Panel */
+  #admin-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 300px;
+    max-height: 100%;
+    overflow-y: auto;
+    background: #111;
+    color: #f5c518;
+    border-left: 2px solid #f5c518;
+    padding: 1rem;
+    display: none;
+    z-index: 1000;
+  }
+  #admin-panel input, #admin-panel select { width: 100%; margin-bottom: 0.5rem; padding:0.3rem; border-radius:4px; border:none; }
+  #admin-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #f5c518;
+    color: #000;
+    border: none;
+    padding: 0.5rem 0.7rem;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  #admin-panel button { width: 100%; background: #f5c518; color: #000; border: none; padding: 0.5rem; margin-top:0.3rem; cursor: pointer; border-radius: 4px; }
+  #admin-panel button:hover { background: white; }
 
-/* Cart Icon */
-.cart-icon { position:fixed; top:20px; right:20px; background:#FF6600; color:white; padding:10px 15px; border-radius:50px; cursor:pointer; font-weight:bold; z-index:1000; }
-.cart-count { background:red; color:white; border-radius:50%; padding:2px 7px; font-size:0.8rem; margin-left:5px; }
-
-/* Cart Modal */
-.cart-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:1001; }
-.cart-content { background:white; width:90%; max-width:500px; padding:20px; border-radius:10px; max-height:80%; overflow-y:auto; position:relative; }
-.cart-content h2 { margin-bottom:10px; }
-.close-cart { position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.2rem; }
-
-/* Cart Items */
-.cart-item { display:flex; justify-content:space-between; margin:10px 0; align-items:center; }
-.cart-item button { background:red; color:white; border:none; border-radius:5px; padding:5px 10px; cursor:pointer; }
-
-/* Payment Section */
-.payment-instructions { background:white; padding:20px; margin:20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); display:none; }
-.payment-instructions h2 { margin-bottom:10px; }
-.contact-btn { background:#046804; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; display:inline-block; margin-top:10px; }
-
-/* Lightbox */
-.lightbox { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:1002; }
-.lightbox img { max-width:90%; max-height:80%; border-radius:10px; }
-.lightbox-close { position:absolute; top:20px; right:30px; font-size:2rem; color:white; cursor:pointer; }
-
-/* Footer */
-footer { text-align:center; padding:20px; background:#333; color:white; margin-top:20px; }
+  @keyframes fadeIn { to {opacity:1;} }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>C4C Tees</h1>
-  <p>Christian-themed T-shirts for Liberia</p>
+  <h1 id="brand-title">C4C Tees</h1>
+  <p id="brand-sub">Christian-Themed Apparel for Liberia</p>
 </header>
 
-<!-- Category Tabs -->
-<section class="categories">
-  <button class="category-btn active" onclick="filterCategory('all')">All</button>
-  <button class="category-btn" onclick="filterCategory('faith')">Faith Tees</button>
-  <button class="category-btn" onclick="filterCategory('kids')">Kids Tees</button>
-  <button class="category-btn" onclick="filterCategory('custom')">Custom Tees</button>
-</section>
+<nav>
+  <button onclick="filterProducts('all')">All</button>
+  <button onclick="filterProducts('faith')">Faith Tees</button>
+  <button onclick="filterProducts('firstlove')">First Love Collection</button>
+  <button onclick="filterProducts('ud')">UD Collection</button>
+  <button onclick="filterProducts('kids')">Kids</button>
+  <button onclick="filterProducts('hoodies')">Hoodies</button>
+  <button onclick="filterProducts('custom')">Custom</button>
+</nav>
 
-<!-- Products Grid -->
-<section class="products" id="productsContainer">
-  <div class="product" data-category="faith">
-    <img src="https://via.placeholder.com/250x250.png?text=Jesus+Is+King" alt="Jesus Is King Tee" onclick="openLightbox(this.src)">
-    <h2>Jesus Is King</h2>
-    <p>$20</p>
-    <button class="buy-btn" onclick="addToCart('Jesus Is King',20)">Add to Cart</button>
-  </div>
-  <div class="product" data-category="faith">
-    <img src="https://via.placeholder.com/250x250.png?text=Faith+Over+Fear" alt="Faith Over Fear Tee" onclick="openLightbox(this.src)">
-    <h2>Faith Over Fear</h2>
-    <p>$18</p>
-    <button class="buy-btn" onclick="addToCart('Faith Over Fear',18)">Add to Cart</button>
-  </div>
-  <div class="product" data-category="kids">
-    <img src="https://via.placeholder.com/250x250.png?text=Little+Disciple" alt="Little Disciple Tee" onclick="openLightbox(this.src)">
-    <h2>Little Disciple</h2>
-    <p>$15</p>
-    <button class="buy-btn" onclick="addToCart('Little Disciple',15)">Add to Cart</button>
-  </div>
-  <div class="product" data-category="custom">
-    <img src="https://via.placeholder.com/250x250.png?text=Custom+Design" alt="Custom Tee" onclick="openLightbox(this.src)">
-    <h2>Custom Design</h2>
-    <p>$25</p>
-    <button class="buy-btn" onclick="addToCart('Custom Design',25)">Add to Cart</button>
-  </div>
-</section>
+<section class="products" id="product-list"></section>
 
-<!-- Cart Icon -->
-<div class="cart-icon" onclick="toggleCart()">Cart <span class="cart-count" id="cartCount">0</span></div>
-
-<!-- Cart Modal -->
-<div class="cart-modal" id="cartModal">
-  <div class="cart-content">
-    <span class="close-cart" onclick="toggleCart()">&times;</span>
-    <h2>Your Cart</h2>
-    <div id="cartItems"></div>
-    <p id="cartTotal"></p>
-    <button class="buy-btn" onclick="checkout()">Checkout</button>
-  </div>
-</div>
-
-<!-- Payment Section -->
-<section class="payment-instructions" id="paymentSection">
+<section id="payment" style="padding:1rem;">
   <h2>Payment Instructions</h2>
-  <p>Please send the total amount via mobile money:</p>
-  <ul>
-    <li>Lonestar Mobile Money: 077-XXX-XXXX</li>
-    <li>Orange Money: 088-XXX-XXXX</li>
-  </ul>
-  <p>After payment, send proof via WhatsApp:</p>
-  <a class="contact-btn" href="https://wa.me/231XXXXXXXXX" target="_blank">Send WhatsApp</a>
+  <p>Please send the total amount via Mobile Money:</p>
+  <p><span class="highlight">Lonestar Money:</span> <span id="lonestar-number">0880466699</span></p>
+  <p><span class="highlight">Orange Money:</span> <span id="orange-number">0776839092</span></p>
+  <p>After payment, send proof via WhatsApp: <a href="https://wa.me/231776839092" target="_blank" class="highlight" id="whatsapp-number">0776839092</a></p>
 </section>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lightboxImg" src="">
-  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-</div>
 
 <footer>
-  <p>&copy; 2025 C4C Tees. All rights reserved.</p>
+  © 2025 C4C Tees. All rights reserved.
 </footer>
 
+<!-- Lightbox -->
+<div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src=""></div>
+
+<!-- Cart Drawer -->
+<div id="cart-drawer">
+  <button class="close-cart" onclick="closeCart()">Close Cart</button>
+  <h2>Your Cart</h2>
+  <ul id="cart-items-drawer"></ul>
+  <p>Total: <span id="cart-total-drawer">$0</span></p>
+</div>
+
+<!-- Admin Panel -->
+<button id="admin-toggle">⚙️ Admin</button>
+<div id="admin-panel">
+  <h3>Admin Panel</h3>
+  <label>Brand Title</label><input type="text" id="admin-brand-title">
+  <label>Brand Subtitle</label><input type="text" id="admin-brand-sub">
+  <label>Lonestar Number</label><input type="text" id="admin-lonestar">
+  <label>Orange Number</label><input type="text" id="admin-orange">
+  <label>WhatsApp Number</label><input type="text" id="admin-whatsapp">
+  <hr>
+  <h4>Add Product</h4>
+  <label>Product Name</label><input type="text" id="admin-product-name">
+  <label>Price</label><input type="number" id="admin-product-price">
+  <label>Category</label>
+  <select id="admin-product-category">
+    <option value="faith">Faith Tees</option>
+    <option value="firstlove">First Love Collection</option>
+    <option value="ud">UD Collection</option>
+    <option value="kids">Kids</option>
+    <option value="hoodies">Hoodies</option>
+    <option value="custom">Custom</option>
+  </select>
+  <label>Image URL</label><input type="text" id="admin-product-img">
+  <button onclick="addProductFromAdmin()">Add Product</button>
+  <button onclick="downloadHTML()">Download Updated HTML</button>
+</div>
+
 <script>
-// Products Category Filter
-function filterCategory(category){
-  const buttons = document.querySelectorAll('.category-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
-
-  const products = document.querySelectorAll('.product');
-  products.forEach(prod => {
-    if(category === 'all' || prod.getAttribute('data-category') === category){
-      prod.style.display = 'block';
-    } else {
-      prod.style.display = 'none';
-    }
-  });
-}
-
-// Lightbox
-function openLightbox(src){
-  document.getElementById('lightbox').style.display = 'flex';
-  document.getElementById('lightboxImg').src = src;
-}
-function closeLightbox(){
-  document.getElementById('lightbox').style.display = 'none';
-}
-
-// Cart
 let cart = [];
-function addToCart(name, price){
-  const itemIndex = cart.findIndex(item => item.name === name);
-  if(itemIndex >= 0){
-    cart[itemIndex].qty += 1;
-  } else {
-    cart.push({name, price, qty:1});
-  }
-  updateCart();
-}
+let products = [
+  {name:"Jesus Is King Tee", price:20, category:"faith", img:"https://via.placeholder.com/200x200.png?text=Jesus+Is+King"},
+  {name:"Faith Over Fear Tee", price:18, category:"faith", img:"https://via.placeholder.com/200x200.png?text=Faith+Over+Fear"},
+  {name:"Little Disciple Tee", price:15, category:"kids", img:"https://via.placeholder.com/200x200.png?text=Little+Disciple"},
+  {name:"C4C Hoodie", price:30, category:"hoodies", img:"https://via.placeholder.com/200x200.png?text=C4C+Hoodie"},
+  {name:"Custom Tee", price:25, category:"custom", img:"https://via.placeholder.com/200x200.png?text=Custom+Design"}
+];
 
-function updateCart(){
-  const cartItems = document.getElementById('cartItems');
-  cartItems.innerHTML = '';
-  let total = 0;
-  cart.forEach((item, i)=>{
-    total += item.price*item.qty;
-    cartItems.innerHTML += `
-      <div class="cart-item">
-        ${item.name} x ${item.qty} - $${item.price*item.qty}
-        <button onclick="removeItem(${i})">Remove</button>
-      </div>
+/* Render Products */
+function renderProducts() {
+  const list = document.getElementById('product-list');
+  list.innerHTML = '';
+  products.forEach((p,i)=>{
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.dataset.category = p.category;
+    div.innerHTML = `
+      <img src="${p.img}" alt="${p.name}" onclick="openLightbox('${p.img}')">
+      <h3>${p.name}</h3>
+      <p>$${p.price}</p>
+      <button onclick="addToCart('${p.name}', ${p.price})">Add to Cart</button>
     `;
+    list.appendChild(div);
   });
-  document.getElementById('cartTotal').innerText = `Total: $${total}`;
-  document.getElementById('cartCount').innerText = cart.length;
+}
+renderProducts();
+
+/* Cart Functions */
+function addToCart(name, price){
+  cart.push({product:name, price});
+  updateCartDrawer();
+  openCart();
+}
+function updateCartDrawer(){
+  const list = document.getElementById('cart-items-drawer');
+  list.innerHTML = '';
+  let total=0;
+  cart.forEach(item=>{
+    let li = document.createElement('li');
+    li.textContent = item.product + ' - $' + item.price;
+    list.appendChild(li);
+    total+=item.price;
+  });
+  document.getElementById('cart-total-drawer').textContent='$'+total;
+}
+function openCart(){ document.getElementById('cart-drawer').style.right='0'; }
+function closeCart(){ document.getElementById('cart-drawer').style.right='-350px'; }
+
+/* Filter Products */
+function filterProducts(category){
+  const productEls = document.querySelectorAll('.product');
+  productEls.forEach(p=>{
+    if(category==='all'||p.dataset.category===category)p.style.display='block';
+    else p.style.display='none';
+  });
 }
 
-function removeItem(index){
-  cart.splice(index,1);
-  updateCart();
-}
+/* Lightbox */
+function openLightbox(src){ document.getElementById('lightbox-img').src=src; document.getElementById('lightbox').style.display='flex'; }
+function closeLightbox(){ document.getElementById('lightbox').style.display='none'; }
 
-function toggleCart(){
-  const modal = document.getElementById('cartModal');
-  modal.style.display = modal.style.display==='flex' ? 'none':'flex';
-}
+/* Payment clickable */
+document.getElementById('lonestar-number').innerHTML=`<a href="tel:*185*0880466699#" class="highlight">0880466699</a>`;
+document.getElementById('orange-number').innerHTML=`<a href="tel:*185*0776839092#" class="highlight">0776839092</a>`;
 
-// Checkout
-function checkout(){
-  if(cart.length===0){
-    alert("Your cart is empty!");
-    return;
+/* Admin Panel */
+const adminToggle=document.getElementById('admin-toggle');
+const adminPanel=document.getElementById('admin-panel');
+let adminUnlocked=false;
+
+adminToggle.addEventListener('click',()=>{
+  if(!adminUnlocked){
+    const pass=prompt("Enter Admin Password:");
+    if(pass==="C4Cadmin123"){ adminUnlocked=true; alert("Admin Panel Unlocked!"); }
+    else{ alert("Wrong password"); return; }
   }
-  document.getElementById('cartModal').style.display='none';
-  document.getElementById('paymentSection').style.display='block';
-  window.scrollTo({ top: document.getElementById('paymentSection').offsetTop, behavior: 'smooth' });
+  adminPanel.style.display=adminPanel.style.display==='none'?'block':'none';
+});
+
+// Sync admin fields
+document.getElementById('admin-brand-title').value=document.getElementById('brand-title').textContent;
+document.getElementById('admin-brand-sub').value=document.getElementById('brand-sub').textContent;
+document.getElementById('admin-lonestar').value="0880466699";
+document.getElementById('admin-orange').value="0776839092";
+document.getElementById('admin-whatsapp').value="0776839092";
+
+document.getElementById('admin-brand-title').addEventListener('input',e=>document.getElementById('brand-title').textContent=e.target.value);
+document.getElementById('admin-brand-sub').addEventListener('input',e=>document.getElementById('brand-sub').textContent=e.target.value);
+document.getElementById('admin-lonestar').addEventListener('input',e=>{
+  document.getElementById('lonestar-number').innerHTML=`<a href="tel:*185*${e.target.value}#" class="highlight">${e.target.value}</a>`;
+});
+document.getElementById('admin-orange').addEventListener('input',e=>{
+  document.getElementById('orange-number').innerHTML=`<a href="tel:*185*${e.target.value}#" class="highlight">${e.target.value}</a>`;
+});
+document.getElementById('admin-whatsapp').addEventListener('input',e=>{
+  document.getElementById('whatsapp-number').textContent=e.target.value;
+  document.getElementById('whatsapp-number').href="https://wa.me/231"+e.target.value;
+});
+
+/* Add Product from Admin */
+function addProductFromAdmin(){
+  const name=document.getElementById('admin-product-name').value;
+  const price=parseFloat(document.getElementById('admin-product-price').value);
+  const category=document.getElementById('admin-product-category').value;
+  const img=document.getElementById('admin-product-img').value;
+  if(!name||!price||!category||!img){ alert("Fill all fields"); return; }
+  products.push({name,price,category,img});
+  renderProducts();
+  alert("Product added!");
+}
+
+/* Download updated HTML */
+function downloadHTML(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download="index.html";
+  a.click();
 }
 </script>
-
 </body>
 </html>
